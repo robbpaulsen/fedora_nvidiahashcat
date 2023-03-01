@@ -43,3 +43,50 @@ shutdown --reboot
 ```
 
 This way the system correctly prepare all the system wide for a whole reboot and it will take 60 seconds to perform it.
+
+## Hashcat Installation
+
+After reboot create a "src" directory just for hashcat source tar ball file, being today the 28 of Februrary the latest source tar ball is Version 6.2.
+
+```
+wget https://hashcat.net/files/hashcat-6.2.6.tar.gz
+```
+
+Use 7zip to extract it:
+
+```
+7z x hashcat-6.2.6.tar.gz
+7z x hashcat-6.2.6.tar
+cd hashcat-6.2.6
+```
+
+## Building Hashcat
+
+to build hashcat is plain straigh forward with make commands
+
+```
+make
+sudo make install
+```
+## Tunning Hashcat to your GPU Card
+
+Run the `hashcat -I` command depending on how many devices it pulls you out you will benchmark hashcat and all the devices that it recognize to set them for password cracking so if it enumarates 1 device you benchmark like this:
+
+```
+hashcat -b -d 1 | uniq
+
+```
+
+If it enumerates 2 you add like this:
+
+```
+hashcat -b -d 1,2 | uniq
+```
+
+If its three:
+
+```
+hashcat -b -d 1,2,3 | uniq
+```
+
+You get the idea form there.
