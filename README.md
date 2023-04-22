@@ -1,48 +1,62 @@
 # Installation of Nvidia drivers Cuda and Hashcat on Fedora 37-ish
 
+## Faster downloads with DNF
+
+Edit with your favorite text editor the file `/etc/dnf/dnf.conf`, you will add this at the end of the last line:
+
+```sh
+
+[main] 
+gpgcheck=1 
+installonly_limit=3 
+clean_requirements_on_remove=True 
+best=False 
+skip_if_unavailable=True 
+fastestmirror=1
+max_parallel_downloads=10 
+deltarpm=true
+```
+Save file and  exit.
+
 ## First thing enable RPM fusion non-free repository
 
-```
+```sh
+
 * sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 ```
+## Update & Reboot
+```sh
 
-## Create a blacklist conf file for the nouveau community driver 
-
-```
-sudo vi /etc/modprobe.d/blacklist.conf
-
-### add this to the file:
-blacklist nouveau
-blacklist lbm-nouveau
-options nouveau modeset=0
-alias nouveau off
-alias lbm-nouveau off
+sudo dnf -y upgrade --refresh
 ```
 
-## Next Steps:
+## Now fedora has a hardware firmware detection and installer for users, install alla missing hardware drivers:
 
+```sh
+
+sudo fwupdmgr get-devices 
+sudo fwupdmgr refresh --force 
+sudo fwupdmgr get-updates 
+sudo fwupdmgr update
 ```
-* sudo dnf update -y
-* sudo dnf install akmod-nvidia    # For rhel/centos users you need to use kmod-nvidia instead
-* sudo dnf install xorg-x11-drv-nvidia
-* sudo dnf install xorg-x11-drv-nvidia-cuda
+
+## Nvidia and Cuda Drivers Installation
+
+```sh
+
+sudo dnf install -y akmod-nvidia
+sudo dnf install -y xorg-x11-drv-nvidia-cuda
 ```
 
-## Giving time 
+# VERY VERY IMPORTANT, AFTER INSTALLATION, LEAVE YOUR MACHINE TO REST FOR AT LEAST 5 MINUTES AND IN PERFECT SCENARIO A 10 MINUTE REST. GPU DRIVERS DONT SHOW RIGHT AWAY AFTER COMPILATION, SO DO NOT REBOOT RIGHTAWAY THIS LEADS TO BLANK SCREENS OR BLACK SCREENS AND/OR KERNEL PANICS.
 
-After the above installations and repository enabling, you need to give your Fedora machine about 5 to 10 minutes to settle and end the transaction, if you cold reboot on finished no bad thing will happen but you'll experience a couple of slow boots, so give it a 10 minute to settle and after that reboot the correct way, but first confirm installation with this:
+After Reboot, check the compiled drivers with:
 
-```
+```sh
+
+modinfo -F version nvidia
 nvidia-smi
 ```
-
-After that you can reboot the machine:
-
-```
-shutdown --reboot
-```
-
-This way the system correctly prepare all the system wide for a whole reboot and it will take 60 seconds to perform it.
 
 ## Hashcat Installation
 
